@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 function LoadTestPage() {
@@ -6,6 +6,8 @@ function LoadTestPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
   const [records, setRecords] = useState([]);
+  const [error, setError] = useState("");
+  const [autoRefresh, setAutoRefresh] = useState(false);
 
   // Backend API (public)
   const API_URL = import.meta.env.VITE_API_URL || "https://backendfastapi.sdude.in";
@@ -14,22 +16,41 @@ function LoadTestPage() {
   const runLoadTest = async () => {
     setLoading(true);
     setResult("");
+    setError("");
     setRecords([]);
+    setAutoRefresh(true);
 
     try {
       const res = await axios.post(`${API_URL}/run-loadtest/`, { count });
-      setResult(res.data.message || "Load test completed.");
-
-      // Fetch latest 1000 payment records
-      const paymentsRes = await axios.get(`${API_URL}/latest-payments/?limit=1000`);
-      setRecords(paymentsRes.data);
+      setResult(res.data.message || "✅ Load test completed successfully.");
     } catch (err) {
       console.error("Load test failed:", err);
-      setResult("❌ Error running load test. Check backend logs or CORS settings.");
+      setError("❌ Error running load test. Check backend logs or CORS settings.");
     } finally {
       setLoading(false);
     }
   };
+
+  // Fetch latest payment records
+  const fetchLatestPayments = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/latest-payments/?limit=1000`);
+      setRecords(res.data);
+    } catch (err) {
+      console.error("Error fetching payments:", err);
+      setError("⚠️ Unable to fetch payment records.");
+    }
+  };
+
+  // Auto-refresh records every 5 seconds while load test is running
+  useEffect(() => {
+    let interval;
+    if (autoRefresh) {
+      fetchLatestPayments(); // first fetch immediately
+      interval = setInterval(fetchLatestPayments, 5000);
+    }
+    return () => clearInterval(interval);
+  }, [autoRefresh]);
 
   return (
     <div style={styles.container}>
@@ -53,7 +74,8 @@ function LoadTestPage() {
         </button>
       </div>
 
-      {result && <p style={styles.result}>{result}</p>}
+      {result && <p style={{ ...styles.result, color: "#007bff" }}>{result}</p>}
+      {error && <p style={{ ...styles.result, color: "red" }}>{error}</p>}
 
       <hr style={{ margin: "30px 0" }} />
 
@@ -62,28 +84,30 @@ function LoadTestPage() {
         <table style={styles.table}>
           <thead>
             <tr>
+              <th>ID</th>
               <th>User ID</th>
               <th>Amount</th>
               <th>Currency</th>
               <th>Description</th>
-              <th>Timestamp</th>
+              <th>Created At</th>
             </tr>
           </thead>
           <tbody>
             {records.length > 0 ? (
               records.map((rec, i) => (
                 <tr key={i}>
+                  <td>{rec.id}</td>
                   <td>{rec.user_id}</td>
                   <td>{rec.amount}</td>
                   <td>{rec.currency}</td>
                   <td>{rec.description}</td>
-                  <td>{rec.timestamp}</td>
+                  <td>{new Date(rec.created_at).toLocaleString()}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="5" style={{ textAlign: "center", padding: "10px" }}>
-                  No records to display. Run a load test first.
+                <td colSpan="6" style={{ textAlign: "center", padding: "10px" }}>
+                  {loading ? "Loading..." : "No records to display. Run a load test first."}
                 </td>
               </tr>
             )}
@@ -142,7 +166,6 @@ const styles = {
     marginTop: "15px",
     textAlign: "center",
     fontWeight: "bold",
-    color: "#333",
   },
   tableContainer: {
     maxHeight: "400px",
