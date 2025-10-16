@@ -9,7 +9,10 @@ function LoadTestPage() {
   const [error, setError] = useState("");
   const [autoRefresh, setAutoRefresh] = useState(false);
 
-  // Backend API (public)
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 100;
+
   const API_URL = import.meta.env.VITE_API_URL || "https://backendfastapi.sdude.in";
 
   // Run Load Test
@@ -19,6 +22,7 @@ function LoadTestPage() {
     setError("");
     setRecords([]);
     setAutoRefresh(true);
+    setCurrentPage(1);
 
     try {
       const res = await axios.post(`${API_URL}/run-loadtest/`, { count });
@@ -31,11 +35,16 @@ function LoadTestPage() {
     }
   };
 
-  // Fetch latest payment records
+  // Fetch latest payment records (sorted DESC)
   const fetchLatestPayments = async () => {
     try {
       const res = await axios.get(`${API_URL}/latest-payments/?limit=1000`);
-      setRecords(res.data);
+      const sortedData = [...res.data].sort((a, b) => {
+        const aTime = new Date(a.created_at).getTime();
+        const bTime = new Date(b.created_at).getTime();
+        return bTime - aTime;
+      });
+      setRecords(sortedData);
     } catch (err) {
       console.error("Error fetching payments:", err);
       setError("⚠️ Unable to fetch payment records.");
@@ -46,11 +55,27 @@ function LoadTestPage() {
   useEffect(() => {
     let interval;
     if (autoRefresh) {
-      fetchLatestPayments(); // first fetch immediately
+      fetchLatestPayments(); // Fetch immediately
       interval = setInterval(fetchLatestPayments, 5000);
     }
     return () => clearInterval(interval);
   }, [autoRefresh]);
+
+  // Pagination logic
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = records.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(records.length / recordsPerPage);
+
+  const nextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+
+  const prevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const goToPage = (page) => setCurrentPage(page);
 
   return (
     <div style={styles.container}>
@@ -80,6 +105,11 @@ function LoadTestPage() {
       <hr style={{ margin: "30px 0" }} />
 
       <h2 style={styles.subheader}>📋 Latest Payment Records</h2>
+      <p style={{ textAlign: "center" }}>
+        Showing {indexOfFirstRecord + 1}–{Math.min(indexOfLastRecord, records.length)} of{" "}
+        {records.length}
+      </p>
+
       <div style={styles.tableContainer}>
         <table style={styles.table}>
           <thead>
@@ -93,8 +123,8 @@ function LoadTestPage() {
             </tr>
           </thead>
           <tbody>
-            {records.length > 0 ? (
-              records.map((rec, i) => (
+            {currentRecords.length > 0 ? (
+              currentRecords.map((rec, i) => (
                 <tr key={i}>
                   <td>{rec.id}</td>
                   <td>{rec.user_id}</td>
@@ -114,16 +144,35 @@ function LoadTestPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      {records.length > recordsPerPage && (
+        <div style={styles.pagination}>
+          <button onClick={prevPage} disabled={currentPage === 1} style={styles.pageButton}>
+            ⏮ Prev
+          </button>
+          <span style={styles.pageInfo}>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={nextPage}
+            disabled={currentPage === totalPages}
+            style={styles.pageButton}
+          >
+            Next ⏭
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
 // --------------------
-// Simple Inline CSS
+// Styles
 // --------------------
 const styles = {
   container: {
-    maxWidth: "900px",
+    maxWidth: "950px",
     margin: "50px auto",
     fontFamily: "Arial, sans-serif",
     color: "#222",
@@ -176,6 +225,22 @@ const styles = {
     width: "100%",
     borderCollapse: "collapse",
     backgroundColor: "#fff",
+  },
+  pagination: {
+    marginTop: "15px",
+    textAlign: "center",
+  },
+  pageButton: {
+    margin: "0 10px",
+    padding: "8px 14px",
+    border: "none",
+    borderRadius: "5px",
+    backgroundColor: "#007bff",
+    color: "white",
+    cursor: "pointer",
+  },
+  pageInfo: {
+    fontWeight: "bold",
   },
 };
 
