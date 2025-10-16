@@ -95,6 +95,7 @@ function getBase64(file) {
             value={formData.password}
             onChange={handleChange}
             required
+            autoComplete="new-password"
           />
         </div>
         <div className="input-group">
