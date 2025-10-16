@@ -10,6 +10,7 @@ import NotFound from './auth/NotFound';
 import { AuthProvider } from './auth/AuthContext';
 import UserDogs from './dogs/UserDogs';
 import DogsAccount from './dogs/DogsAccount';
+import LoadTestPage from "./LoadTestPage";
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/load-test" element={<LoadTestPage />} />
             <Route path="*" element={<NotFound />} /> {/* Catch-all route */}
           </Routes>
         </div>
