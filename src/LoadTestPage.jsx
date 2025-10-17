@@ -11,6 +11,7 @@ function LoadTestPage() {
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [progress, setProgress] = useState({ sent: 0, success: 0, failed: 0 });
   const [recentRecords, setRecentRecords] = useState([]);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   const API_URL = import.meta.env.VITE_API_URL || "https://backendfastapi.sdude.in";
 
@@ -29,17 +30,17 @@ function LoadTestPage() {
       let successCount = 0;
       let failCount = 0;
 
-      const batchRequests = Array.from({ length: totalBatches }, async (_, i) => {
+      for (let i = 0; i < totalBatches; i++) {
         try {
           const res = await axios.post(`${API_URL}/payments/queue/bulk/?batch_size=${size}`);
           successCount += res.data.success || 0;
-        } catch (e) {
+        } catch {
           failCount += 1;
         }
         setProgress({ sent: i + 1, success: successCount, failed: failCount });
-      });
+        await new Promise((r) => setTimeout(r, 50)); // slight delay between batches
+      }
 
-      await Promise.all(batchRequests);
       setResult(`✅ Load test finished. Sent ${totalBatches * size} messages total.`);
     } catch (err) {
       console.error("Load test failed:", err);
@@ -55,6 +56,7 @@ function LoadTestPage() {
     try {
       const res = await axios.get(`${API_URL}/payments/queue/metrics`);
       setMetrics(res.data);
+      setLastUpdated(new Date());
     } catch (err) {
       console.error("Error fetching metrics:", err);
     }
@@ -94,6 +96,7 @@ function LoadTestPage() {
         Send bulk messages to the SQS queue and monitor in real time.
       </p>
 
+      {/* ==== Load Test Controls ==== */}
       <div style={styles.form}>
         <div>
           <label style={styles.label}>Batch Size:</label>
@@ -122,9 +125,11 @@ function LoadTestPage() {
         </button>
       </div>
 
+      {/* ==== Result Messages ==== */}
       {result && <p style={{ ...styles.result, color: "#007bff" }}>{result}</p>}
       {error && <p style={{ ...styles.result, color: "red" }}>{error}</p>}
 
+      {/* ==== Progress Section ==== */}
       <div style={styles.progressContainer}>
         <h3>📦 Progress</h3>
         <p>API Calls Sent: {progress.sent} / {batches}</p>
@@ -134,17 +139,38 @@ function LoadTestPage() {
 
       <hr style={{ margin: "30px 0" }} />
 
+      {/* ==== Queue Metrics ==== */}
       <div style={styles.metricsContainer}>
         <h2>📊 Queue Metrics (auto-refresh every 5s)</h2>
         <p>🟢 Visible: {metrics.visible}</p>
         <p>⚙️ In-flight: {metrics.inflight}</p>
         <p>⏱️ Delayed: {metrics.delayed}</p>
+        {lastUpdated && (
+          <p style={{ color: "#777", fontSize: "14px" }}>
+            Last Updated: {lastUpdated.toLocaleTimeString()}
+          </p>
+        )}
       </div>
 
       <hr style={{ margin: "30px 0" }} />
 
+      {/* ==== Recent Payment Records ==== */}
       <div style={styles.recordsContainer}>
         <h2>🕓 Recent Payment Records (latest 20)</h2>
+        <button
+          onClick={fetchRecentRecords}
+          style={{
+            marginBottom: "10px",
+            background: "#28a745",
+            color: "white",
+            border: "none",
+            padding: "8px 16px",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+        >
+          🔄 Refresh Records
+        </button>
         <table style={styles.table}>
           <thead>
             <tr>
@@ -153,6 +179,7 @@ function LoadTestPage() {
               <th>Amount</th>
               <th>Currency</th>
               <th>Description</th>
+              <th>Status</th>
               <th>Created At</th>
             </tr>
           </thead>
@@ -165,12 +192,13 @@ function LoadTestPage() {
                   <td>₹{rec.amount}</td>
                   <td>{rec.currency}</td>
                   <td>{rec.description}</td>
+                  <td>{rec.status}</td>
                   <td>{new Date(rec.created_at).toLocaleString()}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="6" style={{ textAlign: "center" }}>
+                <td colSpan="7" style={{ textAlign: "center" }}>
                   No recent records yet.
                 </td>
               </tr>
