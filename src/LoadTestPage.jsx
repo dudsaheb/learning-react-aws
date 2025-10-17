@@ -3,13 +3,14 @@ import axios from "axios";
 
 function LoadTestPage() {
   const [batchSize, setBatchSize] = useState(10);
-  const [batches, setBatches] = useState(100); // number of API calls to run
+  const [batches, setBatches] = useState(100);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
   const [error, setError] = useState("");
   const [metrics, setMetrics] = useState({ visible: 0, inflight: 0, delayed: 0 });
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [progress, setProgress] = useState({ sent: 0, success: 0, failed: 0 });
+  const [recentRecords, setRecentRecords] = useState([]);
 
   const API_URL = import.meta.env.VITE_API_URL || "https://backendfastapi.sdude.in";
 
@@ -39,7 +40,6 @@ function LoadTestPage() {
       });
 
       await Promise.all(batchRequests);
-
       setResult(`✅ Load test finished. Sent ${totalBatches * size} messages total.`);
     } catch (err) {
       console.error("Load test failed:", err);
@@ -60,14 +60,29 @@ function LoadTestPage() {
     }
   };
 
-  // Auto-refresh metrics every 3 seconds while load test is running
+  // Fetch Latest Payment Records
+  const fetchRecentRecords = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/payments/latest/?limit=20`);
+      setRecentRecords(res.data);
+    } catch (err) {
+      console.error("Error fetching recent records:", err);
+    }
+  };
+
+  // Auto-refresh metrics and records every 5 seconds while load test is running
   useEffect(() => {
     let interval;
     if (autoRefresh) {
       fetchQueueMetrics();
-      interval = setInterval(fetchQueueMetrics, 3000);
+      fetchRecentRecords();
+      interval = setInterval(() => {
+        fetchQueueMetrics();
+        fetchRecentRecords();
+      }, 5000);
     } else {
       fetchQueueMetrics();
+      fetchRecentRecords();
     }
     return () => clearInterval(interval);
   }, [autoRefresh]);
@@ -81,7 +96,7 @@ function LoadTestPage() {
 
       <div style={styles.form}>
         <div>
-          <label style={styles.label}>Batch Size (messages per call):</label>
+          <label style={styles.label}>Batch Size:</label>
           <input
             type="number"
             value={batchSize}
@@ -92,7 +107,7 @@ function LoadTestPage() {
           />
         </div>
         <div>
-          <label style={styles.label}>Number of Batches:</label>
+          <label style={styles.label}>Batches:</label>
           <input
             type="number"
             value={batches}
@@ -120,10 +135,48 @@ function LoadTestPage() {
       <hr style={{ margin: "30px 0" }} />
 
       <div style={styles.metricsContainer}>
-        <h2>📊 Queue Metrics (auto-refresh every 3s)</h2>
-        <p>🟢 Visible Messages: {metrics.visible}</p>
-        <p>⚙️ In-flight Messages: {metrics.inflight}</p>
-        <p>⏱️ Delayed Messages: {metrics.delayed}</p>
+        <h2>📊 Queue Metrics (auto-refresh every 5s)</h2>
+        <p>🟢 Visible: {metrics.visible}</p>
+        <p>⚙️ In-flight: {metrics.inflight}</p>
+        <p>⏱️ Delayed: {metrics.delayed}</p>
+      </div>
+
+      <hr style={{ margin: "30px 0" }} />
+
+      <div style={styles.recordsContainer}>
+        <h2>🕓 Recent Payment Records (latest 20)</h2>
+        <table style={styles.table}>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>User ID</th>
+              <th>Amount</th>
+              <th>Currency</th>
+              <th>Description</th>
+              <th>Created At</th>
+            </tr>
+          </thead>
+          <tbody>
+            {recentRecords.length > 0 ? (
+              recentRecords.map((rec) => (
+                <tr key={rec.id}>
+                  <td>{rec.id}</td>
+                  <td>{rec.user_id}</td>
+                  <td>₹{rec.amount}</td>
+                  <td>{rec.currency}</td>
+                  <td>{rec.description}</td>
+                  <td>{new Date(rec.created_at).toLocaleString()}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" style={{ textAlign: "center" }}>
+                  No recent records yet.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -134,7 +187,7 @@ function LoadTestPage() {
 // --------------------
 const styles = {
   container: {
-    maxWidth: "900px",
+    maxWidth: "950px",
     margin: "40px auto",
     fontFamily: "Arial, sans-serif",
     color: "#222",
@@ -143,10 +196,7 @@ const styles = {
     padding: "30px",
     boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
   },
-  header: {
-    textAlign: "center",
-    fontSize: "26px",
-  },
+  header: { textAlign: "center", fontSize: "26px" },
   form: {
     display: "flex",
     justifyContent: "center",
@@ -154,16 +204,8 @@ const styles = {
     gap: "15px",
     margin: "20px 0",
   },
-  label: {
-    fontWeight: "bold",
-    display: "block",
-    marginBottom: "5px",
-  },
-  input: {
-    width: "100px",
-    padding: "5px",
-    fontSize: "16px",
-  },
+  label: { fontWeight: "bold", display: "block", marginBottom: "5px" },
+  input: { width: "100px", padding: "5px", fontSize: "16px" },
   button: {
     padding: "10px 20px",
     backgroundColor: "#007bff",
@@ -172,11 +214,7 @@ const styles = {
     color: "white",
     cursor: "pointer",
   },
-  result: {
-    marginTop: "15px",
-    textAlign: "center",
-    fontWeight: "bold",
-  },
+  result: { marginTop: "15px", textAlign: "center", fontWeight: "bold" },
   progressContainer: {
     textAlign: "center",
     marginTop: "20px",
@@ -189,6 +227,16 @@ const styles = {
     background: "#fff",
     padding: "20px",
     borderRadius: "8px",
+  },
+  recordsContainer: {
+    marginTop: "20px",
+    background: "#fff",
+    padding: "20px",
+    borderRadius: "8px",
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
   },
 };
 
