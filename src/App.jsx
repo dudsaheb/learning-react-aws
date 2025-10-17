@@ -54,7 +54,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="/load-test" element={<LoadTestPage />} />
+            <Route path="/loadtest" element={<LoadTestPage />} />
             <Route path="*" element={<NotFound />} /> {/* Catch-all route */}
           </Routes>
         </div>

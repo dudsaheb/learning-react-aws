@@ -2,98 +2,106 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 function LoadTestPage() {
-  const [count, setCount] = useState(10);
+  const [batchSize, setBatchSize] = useState(10);
+  const [batches, setBatches] = useState(100); // number of API calls to run
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
-  const [records, setRecords] = useState([]);
   const [error, setError] = useState("");
+  const [metrics, setMetrics] = useState({ visible: 0, inflight: 0, delayed: 0 });
   const [autoRefresh, setAutoRefresh] = useState(false);
-
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 100;
+  const [progress, setProgress] = useState({ sent: 0, success: 0, failed: 0 });
 
   const API_URL = import.meta.env.VITE_API_URL || "https://backendfastapi.sdude.in";
 
-  // Run Load Test
+  // Run Bulk Load Test
   const runLoadTest = async () => {
     setLoading(true);
     setResult("");
     setError("");
-    setRecords([]);
+    setProgress({ sent: 0, success: 0, failed: 0 });
     setAutoRefresh(true);
-    setCurrentPage(1);
+
+    const totalBatches = parseInt(batches);
+    const size = parseInt(batchSize);
 
     try {
-      const res = await axios.post(`${API_URL}/run-loadtest/`, { count });
-      setResult(res.data.message || "✅ Load test completed successfully.");
+      let successCount = 0;
+      let failCount = 0;
+
+      const batchRequests = Array.from({ length: totalBatches }, async (_, i) => {
+        try {
+          const res = await axios.post(`${API_URL}/payments/queue/bulk/?batch_size=${size}`);
+          successCount += res.data.success || 0;
+        } catch (e) {
+          failCount += 1;
+        }
+        setProgress({ sent: i + 1, success: successCount, failed: failCount });
+      });
+
+      await Promise.all(batchRequests);
+
+      setResult(`✅ Load test finished. Sent ${totalBatches * size} messages total.`);
     } catch (err) {
       console.error("Load test failed:", err);
       setError("❌ Error running load test. Check backend logs or CORS settings.");
     } finally {
       setLoading(false);
+      setAutoRefresh(false);
     }
   };
 
-  // Fetch latest payment records (sorted DESC)
-  const fetchLatestPayments = async () => {
+  // Fetch SQS Queue Metrics
+  const fetchQueueMetrics = async () => {
     try {
-      const res = await axios.get(`${API_URL}/latest-payments/?limit=1000`);
-      const sortedData = [...res.data].sort((a, b) => {
-        const aTime = new Date(a.created_at).getTime();
-        const bTime = new Date(b.created_at).getTime();
-        return bTime - aTime;
-      });
-      setRecords(sortedData);
+      const res = await axios.get(`${API_URL}/payments/queue/metrics`);
+      setMetrics(res.data);
     } catch (err) {
-      console.error("Error fetching payments:", err);
-      setError("⚠️ Unable to fetch payment records.");
+      console.error("Error fetching metrics:", err);
     }
   };
 
-  // Auto-refresh records every 5 seconds while load test is running
+  // Auto-refresh metrics every 3 seconds while load test is running
   useEffect(() => {
     let interval;
     if (autoRefresh) {
-      fetchLatestPayments(); // Fetch immediately
-      interval = setInterval(fetchLatestPayments, 5000);
+      fetchQueueMetrics();
+      interval = setInterval(fetchQueueMetrics, 3000);
+    } else {
+      fetchQueueMetrics();
     }
     return () => clearInterval(interval);
   }, [autoRefresh]);
 
-  // Pagination logic
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = records.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(records.length / recordsPerPage);
-
-  const nextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
-
-  const prevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
-
-  const goToPage = (page) => setCurrentPage(page);
-
   return (
     <div style={styles.container}>
-      <h1 style={styles.header}>🚀 Payment API Load Tester</h1>
-      <p style={{ textAlign: "center", color: "#666" }}>
-        Public page — no authentication required
+      <h1 style={styles.header}>🚀 AWS SQS Payment Load Tester</h1>
+      <p style={{ textAlign: "center", color: "#555" }}>
+        Send bulk messages to the SQS queue and monitor in real time.
       </p>
 
       <div style={styles.form}>
-        <label style={styles.label}>Number of Requests:</label>
-        <input
-          type="number"
-          value={count}
-          onChange={(e) => setCount(e.target.value)}
-          min="1"
-          max="1000"
-          style={styles.input}
-        />
+        <div>
+          <label style={styles.label}>Batch Size (messages per call):</label>
+          <input
+            type="number"
+            value={batchSize}
+            onChange={(e) => setBatchSize(e.target.value)}
+            min="1"
+            max="100"
+            style={styles.input}
+          />
+        </div>
+        <div>
+          <label style={styles.label}>Number of Batches:</label>
+          <input
+            type="number"
+            value={batches}
+            onChange={(e) => setBatches(e.target.value)}
+            min="1"
+            max="2000"
+            style={styles.input}
+          />
+        </div>
         <button onClick={runLoadTest} style={styles.button} disabled={loading}>
           {loading ? "Running..." : "Run Load Test"}
         </button>
@@ -102,67 +110,21 @@ function LoadTestPage() {
       {result && <p style={{ ...styles.result, color: "#007bff" }}>{result}</p>}
       {error && <p style={{ ...styles.result, color: "red" }}>{error}</p>}
 
-      <hr style={{ margin: "30px 0" }} />
-
-      <h2 style={styles.subheader}>📋 Latest Payment Records</h2>
-      <p style={{ textAlign: "center" }}>
-        Showing {indexOfFirstRecord + 1}–{Math.min(indexOfLastRecord, records.length)} of{" "}
-        {records.length}
-      </p>
-
-      <div style={styles.tableContainer}>
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>User ID</th>
-              <th>Amount</th>
-              <th>Currency</th>
-              <th>Description</th>
-              <th>Created At</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentRecords.length > 0 ? (
-              currentRecords.map((rec, i) => (
-                <tr key={i}>
-                  <td>{rec.id}</td>
-                  <td>{rec.user_id}</td>
-                  <td>{rec.amount}</td>
-                  <td>{rec.currency}</td>
-                  <td>{rec.description}</td>
-                  <td>{new Date(rec.created_at).toLocaleString()}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6" style={{ textAlign: "center", padding: "10px" }}>
-                  {loading ? "Loading..." : "No records to display. Run a load test first."}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      <div style={styles.progressContainer}>
+        <h3>📦 Progress</h3>
+        <p>API Calls Sent: {progress.sent} / {batches}</p>
+        <p>✅ Success: {progress.success}</p>
+        <p>❌ Failed: {progress.failed}</p>
       </div>
 
-      {/* Pagination Controls */}
-      {records.length > recordsPerPage && (
-        <div style={styles.pagination}>
-          <button onClick={prevPage} disabled={currentPage === 1} style={styles.pageButton}>
-            ⏮ Prev
-          </button>
-          <span style={styles.pageInfo}>
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={nextPage}
-            disabled={currentPage === totalPages}
-            style={styles.pageButton}
-          >
-            Next ⏭
-          </button>
-        </div>
-      )}
+      <hr style={{ margin: "30px 0" }} />
+
+      <div style={styles.metricsContainer}>
+        <h2>📊 Queue Metrics (auto-refresh every 3s)</h2>
+        <p>🟢 Visible Messages: {metrics.visible}</p>
+        <p>⚙️ In-flight Messages: {metrics.inflight}</p>
+        <p>⏱️ Delayed Messages: {metrics.delayed}</p>
+      </div>
     </div>
   );
 }
@@ -172,11 +134,11 @@ function LoadTestPage() {
 // --------------------
 const styles = {
   container: {
-    maxWidth: "950px",
-    margin: "50px auto",
+    maxWidth: "900px",
+    margin: "40px auto",
     fontFamily: "Arial, sans-serif",
     color: "#222",
-    background: "#fafafa",
+    background: "#f9f9f9",
     borderRadius: "10px",
     padding: "30px",
     boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
@@ -185,18 +147,17 @@ const styles = {
     textAlign: "center",
     fontSize: "26px",
   },
-  subheader: {
-    marginBottom: "10px",
-  },
   form: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    gap: "10px",
+    gap: "15px",
     margin: "20px 0",
   },
   label: {
     fontWeight: "bold",
+    display: "block",
+    marginBottom: "5px",
   },
   input: {
     width: "100px",
@@ -216,31 +177,18 @@ const styles = {
     textAlign: "center",
     fontWeight: "bold",
   },
-  tableContainer: {
-    maxHeight: "400px",
-    overflowY: "auto",
-    marginTop: "20px",
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-    backgroundColor: "#fff",
-  },
-  pagination: {
-    marginTop: "15px",
+  progressContainer: {
     textAlign: "center",
+    marginTop: "20px",
+    background: "#fff",
+    padding: "10px",
+    borderRadius: "8px",
   },
-  pageButton: {
-    margin: "0 10px",
-    padding: "8px 14px",
-    border: "none",
-    borderRadius: "5px",
-    backgroundColor: "#007bff",
-    color: "white",
-    cursor: "pointer",
-  },
-  pageInfo: {
-    fontWeight: "bold",
+  metricsContainer: {
+    textAlign: "center",
+    background: "#fff",
+    padding: "20px",
+    borderRadius: "8px",
   },
 };
 
