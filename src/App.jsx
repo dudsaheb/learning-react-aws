@@ -55,6 +55,7 @@ function App() {
               }
             />
             <Route path="/loadtest" element={<LoadTestPage />} />
+            <Route path="/paytest" element={<LoadTestPage />} />
             <Route path="*" element={<NotFound />} /> {/* Catch-all route */}
           </Routes>
         </div>
