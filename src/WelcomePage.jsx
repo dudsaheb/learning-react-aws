@@ -42,7 +42,7 @@ function WelcomePage() {
             <li><a href="/ai-ml-demo" style={styles.link}>AI / ML Project Demos</a></li>
           </ul>
 
-          <a href="/Shaik_Dud_Saheb_Resume.pdf" download style={styles.resumeBtn}>📥 Download Resume</a>
+          <a href="https://sdude-demo-bucket-22oct2025.s3.us-east-1.amazonaws.com/Resume_shaik_3c_TPM.pdf" download style={styles.resumeBtn}>📥 Download Resume</a>
         </div>
 
         {/* Details */}
