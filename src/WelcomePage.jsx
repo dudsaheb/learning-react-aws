@@ -52,11 +52,16 @@ function WelcomePage() {
           <p><strong>Location:</strong><br/> Bengaluru, India</p>
 
           {/* SOCIAL ICONS */}
+          
           <div style={styles.socialRow}>
-            <a href="https://linkedin.com" style={styles.socialIcon}>🔗</a>
+            <a href="http://linkedin.in/in/sdudsaheb" style={styles.socialIcon}>🔗 Linkedin</a>
+            {/* 
             <a href="https://github.com" style={styles.socialIcon}>🐙</a>
             <a href="https://x.com" style={styles.socialIcon}>🐦</a>
-          </div>
+            */}
+          </div> 
+          
+
         </div>
 
       </div>
@@ -69,14 +74,21 @@ function WelcomePage() {
 /* ============ INLINE CSS ============ */
 const styles = {
   container: {
-    fontFamily: "Arial, sans-serif",
-    padding: "40px",
-    background: "linear-gradient(135deg, #A8FBD3 0%, #4FB7B3 60%, #637AB9 100%)",
-    minHeight: "100vh",
-    width: "100%",
-    color: "#31326F",
-    textAlign: "center",
-  },
+  fontFamily: "Arial, sans-serif",
+  padding: "40px",
+  background: "linear-gradient(135deg, #A8FBD3 0%, #4FB7B3 60%, #637AB9 100%)",
+  backgroundAttachment: "fixed",
+  minHeight: "100vh",
+  height: "100%",
+  width: "100%",
+  color: "#31326F",
+  textAlign: "center",
+  margin: 0,
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "flex-start"
+},
+
 
   /* HEADER IMAGE + TEXT */
   headerRow: {
@@ -107,16 +119,20 @@ const styles = {
 
   /* Main content card */
   row: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "flex-start",
-    gap: "60px",
-    background: "#ffffffd9",
-    padding: "35px",
-    borderRadius: "12px",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-    marginBottom: "60px",
-  },
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "flex-start",
+  gap: "60px",
+  background: "#ffffffd9",
+  padding: "35px",
+  borderRadius: "12px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+  marginBottom: "60px",
+  width: "fit-content",
+  marginLeft: "auto",
+  marginRight: "auto"
+},
+
 
   column: {
     width: "250px",
