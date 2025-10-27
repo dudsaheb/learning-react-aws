@@ -11,6 +11,8 @@ import { AuthProvider } from './auth/AuthContext';
 import UserDogs from './dogs/UserDogs';
 import DogsAccount from './dogs/DogsAccount';
 import LoadTestPage from "./LoadTestPage";
+import WelcomePage from './WelcomePage';  
+
 
 function App() {
   return (
@@ -19,7 +21,8 @@ function App() {
         <Navbar />
         <div className="custom-container">
           <Routes>
-            <Route path="/" element={<LoginPage />} />
+            {/* <Route path="/" element={<LoginPage />} /> */}
+            <Route path="/" element={<WelcomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route
