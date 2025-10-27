@@ -5,9 +5,18 @@ function WelcomePage() {
   return (
     <div style={styles.container}>
 
-      {/* Main Title */}
-      <h1 style={styles.title}>Profile</h1>
-      <p style={styles.subtitle}>I'm a creative technology leader</p>
+      {/* Header Section with image on left, title + subtitle on right */}
+      <div style={styles.headerRow}>
+        <img
+          src="https://sdude-demo-bucket-22oct2025.s3.us-east-1.amazonaws.com/_photo_Shaik_DSC_0011a.jpg"
+          alt="Shaik"
+          style={styles.headerProfileImg}
+        />
+        <div>
+          <h1 style={styles.title}>Profile</h1>
+          <p style={styles.subtitle}>I'm a creative technology leader</p>
+        </div>
+      </div>
 
       {/* Content Row */}
       <div style={styles.row}>
@@ -23,13 +32,16 @@ function WelcomePage() {
           </p>
         </div>
 
-        {/* Image */}
-        <div style={styles.centerColumn}>
-          <img
-            src="/_photo_Shaik_DSC_0011a.jpg"
-            alt="Shaik"
-            style={styles.profileImg}
-          />
+        {/* Project Links (Now Center Column) */}
+        <div style={styles.projectColumn}>
+          <h2 style={styles.sectionHeader}>Projects</h2>
+          <ul style={styles.linkList}>
+            <li><a href="/login" style={styles.link}>React Project (Petowners) + FastAPI</a></li>
+            <li><a href="/paytest" style={styles.link}>Payment Load Simulator</a></li>
+            <li><a href="/ai-ml-demo" style={styles.link}>AI / ML Project Demos</a></li>
+          </ul>
+
+          <a href="/Shaik_Dud_Saheb_Resume.pdf" download style={styles.resumeBtn}>📥 Download Resume</a>
         </div>
 
         {/* Details */}
@@ -49,18 +61,6 @@ function WelcomePage() {
 
       </div>
 
-      {/* Project Links */}
-      <div style={styles.bottomSection}>
-        <h3 style={styles.sectionHeader}>Explore My Project Demos</h3>
-        <ul style={styles.linkList}>
-          <li><a href="/login" style={styles.link}>React Project (Petowners) + FastAPI</a></li>
-          <li><a href="/paytest" style={styles.link}>Payment Load Simulator</a></li>
-          <li><a href="/ai-ml-demo" style={styles.link}>AI / ML Project Demos</a></li>
-        </ul>
-
-        <a href="/Shaik_Dud_Saheb_Resume.pdf" download style={styles.resumeBtn}>📥 Download My Resume</a>
-      </div>
-
       <p style={styles.footer}>© {new Date().getFullYear()} sdude.in — All Rights Reserved</p>
     </div>
   );
@@ -73,9 +73,27 @@ const styles = {
     padding: "40px",
     background: "linear-gradient(135deg, #A8FBD3 0%, #4FB7B3 60%, #637AB9 100%)",
     minHeight: "100vh",
+    width: "100%",
     color: "#31326F",
     textAlign: "center",
   },
+
+  /* HEADER IMAGE + TEXT */
+  headerRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "30px",
+    marginBottom: "40px"
+  },
+  headerProfileImg: {
+    borderRadius: "50%",
+    width: "140px",
+    height: "140px",
+    border: "6px solid #4FB7B3",
+    boxShadow: "0 0 12px rgba(49,50,111,0.4)"
+  },
+
   title: {
     fontSize: "42px",
     marginBottom: "5px",
@@ -84,36 +102,33 @@ const styles = {
   subtitle: {
     color: "#31326F",
     fontSize: "18px",
-    marginBottom: "50px",
     opacity: 0.85
   },
+
+  /* Main content card */
   row: {
     display: "flex",
     justifyContent: "center",
     alignItems: "flex-start",
     gap: "60px",
-    marginBottom: "60px",
     background: "#ffffffd9",
-    padding: "30px",
+    padding: "35px",
     borderRadius: "12px",
     boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+    marginBottom: "60px",
   },
+
   column: {
     width: "250px",
     textAlign: "left"
   },
-  centerColumn: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center"
+
+  /* Projects column */
+  projectColumn: {
+    width: "280px",
+    textAlign: "center"
   },
-  profileImg: {
-    borderRadius: "50%",
-    width: "170px",
-    height: "170px",
-    border: "6px solid #4FB7B3",
-    boxShadow: "0 0 12px rgba(49,50,111,0.4)"
-  },
+
   sectionHeader: {
     fontSize: "24px",
     marginBottom: "10px",
@@ -136,18 +151,16 @@ const styles = {
   socialIcon: {
     fontSize: "26px",
     textDecoration: "none",
-    cursor: "pointer",
     transition: "0.3s",
     color: "#637AB9"
   },
-  bottomSection: {
-    marginTop: "40px",
-  },
+
   linkList: {
     listStyle: "none",
     padding: 0,
     fontSize: "16px",
-    marginBottom: "25px"
+    marginBottom: "25px",
+    textAlign: "left"
   },
   link: {
     textDecoration: "none",
@@ -156,18 +169,19 @@ const styles = {
     fontWeight: 600,
     transition: "0.3s"
   },
+
   resumeBtn: {
-    padding: "12px 22px",
+    padding: "10px 18px",
     background: "#31326F",
     borderRadius: "6px",
     color: "#fff",
     textDecoration: "none",
-    fontSize: "16px",
+    fontSize: "15px",
     boxShadow: "0 3px 7px rgba(49,50,111,0.4)",
     transition: "0.3s"
   },
+
   footer: {
-    marginTop: "50px",
     fontSize: "13px",
     color: "#31326F",
     opacity: 0.8
