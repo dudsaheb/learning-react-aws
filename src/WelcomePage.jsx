@@ -173,10 +173,16 @@ const styles = {
     width: "250px",
     textAlign: "left"
   },
+
   projectColumn: {
-    width: "280px",
-    textAlign: "center"
-  },
+  width: "280px",
+  textAlign: "center",
+  background: "#F2F4F8CC", // subtle light grey w/ transparency
+  padding: "20px",
+  borderRadius: "10px",
+  boxShadow: "0 2px 6px rgba(0,0,0,0.12)"
+},
+
 
   sectionHeader: {
     fontSize: "24px",
