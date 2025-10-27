@@ -18,7 +18,7 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <Navbar />
+        {/* <Navbar /> */}
         <div className="custom-container">
           <Routes>
             {/* <Route path="/" element={<LoginPage />} /> */}
