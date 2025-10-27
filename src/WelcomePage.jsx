@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 //import { useNavigate } from 'react-router-dom';
 //import { useAuth } from './auth/AuthContext';
-import 'App.css';
+import './App.css';
 
 function WelcomePage() {
   return (
