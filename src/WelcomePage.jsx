@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 
 function WelcomePage() {
+  const [hovered, setHovered] = useState(null);
+
   return (
     <div style={styles.container}>
 
-      {/* Header Section with image on left, title + subtitle on right */}
+      {/* Header Section */}
       <div style={styles.headerRow}>
         <img
           src="https://sdude-demo-bucket-22oct2025.s3.us-east-1.amazonaws.com/_photo_Shaik_DSC_0011a.jpg"
@@ -33,16 +35,55 @@ function WelcomePage() {
           </p>
         </div>
 
-        {/* Project Links (Now Center Column) */}
+        {/* Projects */}
         <div style={styles.projectColumn}>
           <h2 style={styles.sectionHeader}>Projects</h2>
+          
           <ul style={styles.linkList}>
-            <li><a href="/login" style={styles.link}>React Project (Petowners) + FastAPI</a></li>
-            <li><a href="/paytest" style={styles.link}>Payment Load Simulator</a></li>
-            <li><a href="/ai-ml-demo" style={styles.link}>AI / ML Project Demos</a></li>
+            {[
+              { text: "React Project (Petowners) + FastAPI", href: "/login" },
+              { text: "Payment Load Simulator", href: "/paytest" },
+              { text: "AI / ML Project Demos", href: "/ai-ml-demo" },
+            ].map((item, index) => (
+              <li key={index}>
+                <a
+                  href={item.href}
+                  style={{
+                    ...styles.link,
+                    ...(hovered === index ? styles.linkHover : {})
+                  }}
+                  onMouseEnter={() => setHovered(index)}
+                  onMouseLeave={() => setHovered(null)}
+                >
+                  {item.text}
+
+                  {/* Arrow */}
+                  <span style={{
+                    ...styles.arrow,
+                    ...(hovered === index ? styles.arrowHover : {})
+                  }}>
+                    ➜
+                  </span>
+
+                  {/* Underline */}
+                  <span style={{
+                    ...styles.underline,
+                    ...(hovered === index ? styles.underlineHover : {})
+                  }}/>
+                </a>
+              </li>
+            ))}
           </ul>
 
-          <a href="https://sdude-demo-bucket-22oct2025.s3.us-east-1.amazonaws.com/Resume_shaik_3c_TPM.pdf" download style={styles.resumeBtn}>📥 Download Resume</a>
+          <a
+            href="https://sdude-demo-bucket-22oct2025.s3.us-east-1.amazonaws.com/Resume_shaik_3c_TPM.pdf"
+            download
+            style={styles.resumeBtn}
+            onMouseEnter={(e) => Object.assign(e.target.style, styles.resumeBtnHover)}
+            onMouseLeave={(e) => Object.assign(e.target.style, styles.resumeBtn)}
+          >
+            📥 Download Resume
+          </a>
         </div>
 
         {/* Details */}
@@ -52,17 +93,9 @@ function WelcomePage() {
           <p><strong>Experience:</strong><br/> 16+ years</p>
           <p><strong>Location:</strong><br/> Bengaluru, India</p>
 
-          {/* SOCIAL ICONS */}
-          
           <div style={styles.socialRow}>
             <a href="http://linkedin.in/in/sdudsaheb" style={styles.socialIcon}>🔗 Linkedin</a>
-            {/* 
-            <a href="https://github.com" style={styles.socialIcon}>🐙</a>
-            <a href="https://x.com" style={styles.socialIcon}>🐦</a>
-            */}
           </div> 
-          
-
         </div>
 
       </div>
@@ -75,23 +108,21 @@ function WelcomePage() {
 /* ============ INLINE CSS ============ */
 const styles = {
   container: {
-  fontFamily: "Arial, sans-serif",
-  padding: "40px",
-  background: "linear-gradient(135deg, #A8FBD3 0%, #4FB7B3 60%, #637AB9 100%)",
-  backgroundAttachment: "fixed",
-  minHeight: "100vh",
-  height: "100%",
-  width: "100%",
-  color: "#31326F",
-  textAlign: "center",
-  margin: 0,
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "flex-start"
-},
+    fontFamily: "Arial, sans-serif",
+    padding: "40px",
+    background: "linear-gradient(135deg, #A8FBD3 0%, #4FB7B3 60%, #637AB9 100%)",
+    backgroundAttachment: "fixed",
+    minHeight: "100vh",
+    height: "100%",
+    width: "100%",
+    color: "#31326F",
+    textAlign: "center",
+    margin: 0,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "flex-start"
+  },
 
-
-  /* HEADER IMAGE + TEXT */
   headerRow: {
     display: "flex",
     alignItems: "center",
@@ -123,29 +154,25 @@ const styles = {
     opacity: 0.85
   },
 
-  /* Main content card */
   row: {
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "flex-start",
-  gap: "60px",
-  background: "#ffffffd9",
-  padding: "35px",
-  borderRadius: "12px",
-  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-  marginBottom: "60px",
-  width: "fit-content",
-  marginLeft: "auto",
-  marginRight: "auto"
-},
-
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    gap: "60px",
+    background: "#ffffffd9",
+    padding: "35px",
+    borderRadius: "12px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+    marginBottom: "60px",
+    width: "fit-content",
+    marginLeft: "auto",
+    marginRight: "auto"
+  },
 
   column: {
     width: "250px",
     textAlign: "left"
   },
-
-  /* Projects column */
   projectColumn: {
     width: "280px",
     textAlign: "center"
@@ -165,6 +192,7 @@ const styles = {
     color: "#31326F",
     opacity: 0.85
   },
+
   socialRow: {
     marginTop: "15px",
     display: "flex",
@@ -174,24 +202,65 @@ const styles = {
     fontSize: "26px",
     textDecoration: "none",
     transition: "0.3s",
-    color: "#637AB9"
+    color: "#637AB9",
+    cursor: "pointer"
   },
 
+  /* PROJECT LINKS */
   linkList: {
     listStyle: "none",
     padding: 0,
     fontSize: "16px",
     marginBottom: "25px",
-    textAlign: "left"
+    textAlign: "left",
   },
   link: {
     textDecoration: "none",
     color: "#31326F",
-    lineHeight: "2",
+    lineHeight: "2.4",
     fontWeight: 600,
-    transition: "0.3s"
+    transition: "0.25s",
+    display: "block",
+    padding: "8px 12px",
+    borderRadius: "6px",
+    cursor: "pointer",
+    position: "relative",
+  },
+  linkHover: {
+    background: "#A8FBD3",
+    transform: "translateX(6px) scale(1.02)",
+    boxShadow: "0 3px 6px rgba(0,0,0,0.18)",
+    borderRadius: "6px"
   },
 
+  /* Animated Arrow */
+  arrow: {
+    opacity: 0,
+    marginLeft: "5px",
+    transition: "0.25s",
+    position: "relative",
+    top: "1px"
+  },
+  arrowHover: {
+    opacity: 1,
+    marginLeft: "10px",
+  },
+
+  /* Underline Animation */
+  underline: {
+    content: "''",
+    display: "block",
+    height: "2px",
+    width: "0%",
+    background: "#4FB7B3",
+    transition: "0.3s",
+    marginTop: "2px"
+  },
+  underlineHover: {
+    width: "100%",
+  },
+
+  /* Resume Button */
   resumeBtn: {
     padding: "10px 18px",
     background: "#31326F",
@@ -200,7 +269,13 @@ const styles = {
     textDecoration: "none",
     fontSize: "15px",
     boxShadow: "0 3px 7px rgba(49,50,111,0.4)",
-    transition: "0.3s"
+    transition: "0.3s",
+    display: "inline-block",
+    marginTop: "10px",
+  },
+  resumeBtnHover: {
+    transform: "translateY(-2px)",
+    boxShadow: "0 6px 12px rgba(49,50,111,0.4)"
   },
 
   footer: {
