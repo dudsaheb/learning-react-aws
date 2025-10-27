@@ -26,8 +26,8 @@ function WelcomePage() {
         {/* Image */}
         <div style={styles.centerColumn}>
           <img
-            src="https://via.placeholder.com/170"
-            alt="profile"
+            src="/_photo_Shaik_DSC_0011a.jpg"
+            alt="Shaik"
             style={styles.profileImg}
           />
         </div>
@@ -71,17 +71,21 @@ const styles = {
   container: {
     fontFamily: "Arial, sans-serif",
     padding: "40px",
-    background: "#ffffff",
+    background: "linear-gradient(135deg, #A8FBD3 0%, #4FB7B3 60%, #637AB9 100%)",
+    minHeight: "100vh",
+    color: "#31326F",
     textAlign: "center",
   },
   title: {
     fontSize: "42px",
-    marginBottom: "5px"
+    marginBottom: "5px",
+    color: "#31326F",
   },
   subtitle: {
-    color: "#666",
+    color: "#31326F",
     fontSize: "18px",
-    marginBottom: "50px"
+    marginBottom: "50px",
+    opacity: 0.85
   },
   row: {
     display: "flex",
@@ -89,6 +93,10 @@ const styles = {
     alignItems: "flex-start",
     gap: "60px",
     marginBottom: "60px",
+    background: "#ffffffd9",
+    padding: "30px",
+    borderRadius: "12px",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
   },
   column: {
     width: "250px",
@@ -103,16 +111,22 @@ const styles = {
     borderRadius: "50%",
     width: "170px",
     height: "170px",
-    border: "4px solid #ddd",
+    border: "6px solid #4FB7B3",
+    boxShadow: "0 0 12px rgba(49,50,111,0.4)"
   },
   sectionHeader: {
     fontSize: "24px",
-    marginBottom: "10px"
+    marginBottom: "10px",
+    color: "#31326F",
+    borderBottom: "3px solid #637AB9",
+    display: "inline-block",
+    paddingBottom: "6px"
   },
   paragraph: {
     lineHeight: "1.6",
     fontSize: "15px",
-    color: "#444"
+    color: "#31326F",
+    opacity: 0.85
   },
   socialRow: {
     marginTop: "15px",
@@ -120,8 +134,11 @@ const styles = {
     gap: "15px",
   },
   socialIcon: {
-    fontSize: "24px",
+    fontSize: "26px",
     textDecoration: "none",
+    cursor: "pointer",
+    transition: "0.3s",
+    color: "#637AB9"
   },
   bottomSection: {
     marginTop: "40px",
@@ -134,21 +151,26 @@ const styles = {
   },
   link: {
     textDecoration: "none",
-    color: "#0073e6",
-    lineHeight: "2"
+    color: "#31326F",
+    lineHeight: "2",
+    fontWeight: 600,
+    transition: "0.3s"
   },
   resumeBtn: {
     padding: "12px 22px",
-    background: "#28a745",
+    background: "#31326F",
     borderRadius: "6px",
     color: "#fff",
     textDecoration: "none",
     fontSize: "16px",
+    boxShadow: "0 3px 7px rgba(49,50,111,0.4)",
+    transition: "0.3s"
   },
   footer: {
     marginTop: "50px",
     fontSize: "13px",
-    color: "#888",
+    color: "#31326F",
+    opacity: 0.8
   }
 };
 
