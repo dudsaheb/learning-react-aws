@@ -13,8 +13,9 @@ function WelcomePage() {
           style={styles.headerProfileImg}
         />
         <div>
-          <h1 style={styles.title}>Profile</h1>
-          <p style={styles.subtitle}>I'm a creative technology leader</p>
+          <h1 style={styles.title}>SHAIK DUDSAHEB</h1>
+          <h1 style={styles.name_title}>Engineering Leader | Cloud • Mobile • AI Integration</h1>
+          <p style={styles.subtitle}>Transforming business challenges into powerful digital solutions</p>
         </div>
       </div>
 
@@ -107,7 +108,12 @@ const styles = {
   },
 
   title: {
-    fontSize: "42px",
+    fontSize: "25px",
+    marginBottom: "5px",
+    color: "#31326F",
+  },
+  name_title: {
+    fontSize: "20px",
     marginBottom: "5px",
     color: "#31326F",
   },
