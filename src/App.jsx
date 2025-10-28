@@ -52,6 +52,13 @@ function App() {
       <AuthProvider>
         <Routes>
           {/* ===== Public Routes (No Header/Footer) ===== */}
+          {/* ===== Landing Pages (NO Header/Footer) ===== */}
+          <Route path="/" element={<WelcomePage />} />
+          <Route path="/welcome" element={<WelcomePage />} />
+          <Route path="/house-price-ai-ml-demo" element={<HousePriceDemo />} />
+          <Route path="/property-search-by-agentic-ai" element={<HousePricePropertyAgentDemo />} />
+          <Route path="/paytest" element={<LoadTestPage />} />
+
           <Route
             path="/login"
             element={
@@ -70,39 +77,11 @@ function App() {
           />
 
           {/* ===== Public Routes with Header/Footer ===== */}
-          <Route
-            path="/"
-            element={
-              <Layout>
-                <WelcomePage />
-              </Layout>
-            }
-          />
-          <Route
-            path="/welcome"
-            element={
-              <Layout>
-                <WelcomePage />
-              </Layout>
-            }
-          />
-          <Route
-            path="/house-price-ai-ml-demo"
-            element={
-              <Layout>
-                <HousePriceDemo />
-              </Layout>
-            }
-          />
-          <Route
-            path="/property-search-by-agentic-ai"
-            element={
-              <Layout>
-                <HousePricePropertyAgentDemo />
-              </Layout>
-            }
-          />
-          <Route
+          
+          
+          
+          
+          {/* <Route
             path="/predict"
             element={
               <Layout>
@@ -117,15 +96,16 @@ function App() {
                 <ResultCard />
               </Layout>
             }
-          />
-          <Route
+          /> */}
+
+          {/* <Route
             path="/loadtest"
             element={
               <Layout>
                 <LoadTestPage />
               </Layout>
             }
-          />
+          /> */}
 
           {/* ===== Protected Routes (Header/Footer Included) ===== */}
           <Route
@@ -173,9 +153,9 @@ function App() {
           <Route
             path="*"
             element={
-              <Layout>
+              
                 <NotFound />
-              </Layout>
+              
             }
           />
         </Routes>
