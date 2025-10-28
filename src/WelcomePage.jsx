@@ -100,6 +100,7 @@ function WelcomePage() {
               { text: "Payment Load Simulator", href: "/paytest" },
               { text: "House Price Prediction - Agentic AI", href: "/house-price-ai-ml-demo" },
               
+              
             ].map((item, index) => (
               <li key={index}>
                 <a

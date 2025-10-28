@@ -29,6 +29,9 @@ function LoginPage() {
     <div className="login-container">
       <form onSubmit={handleLogin} className="login-form">
         <h1>Login</h1>
+        <h3> Demo Credentials</h3>
+        <h4> Username: testuser123 </h4>
+        <h4> Password: password </h4>
         <div className="input-group">
           <label htmlFor="username">Username</label>
           <input
