@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "../api/api"; // ✅ make sure baseURL = https://backendfastapi.sdude.in/
+//import axios from "../api/api"; // ✅ make sure baseURL = https://backendfastapi.sdude.in/
+import { api as axios } from "../api/api";
 import ResultCard from "./ResultCard";
 
 /**
