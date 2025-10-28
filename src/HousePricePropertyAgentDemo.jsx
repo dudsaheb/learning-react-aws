@@ -25,14 +25,7 @@ const HousePricePropertyAgentDemo = () => {
         <section style={styles.section}>
           <PricePredictor />
         </section>
-      </main>
-
-      {agentAdvice && (
-        <div style={{ marginTop: 18, background: "#fff7", padding: 16, borderRadius: 8 }}>
-          <h4>🤖 Agent Advice</h4>
-          <div style={{ whiteSpace: "pre-wrap" }}>{agentAdvice}</div>
-        </div>
-      )}
+      </main>      
 
 
       {/* ===== Footer ===== */}

@@ -98,8 +98,8 @@ function WelcomePage() {
             {[
               { text: "Petowners — React (frontend) and FastAPI (backend), deployed on AWS.", href: "/login" },
               { text: "Payment Load Simulator", href: "/paytest" },
-              { text: "ML Project - House Price Prediction", href: "/house-price-ai-ml-demo" },
-              { text: "Agentic AI - Property Agent", href: "/property-search-by-agentic-ai" },
+              { text: "House Price Prediction - Agentic AI", href: "/house-price-ai-ml-demo" },
+              
             ].map((item, index) => (
               <li key={index}>
                 <a
