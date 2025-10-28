@@ -1,17 +1,7 @@
+// ✅ src/components/PricePredictor.jsx
 import React, { useState, useEffect } from "react";
-//import axios from "../api/api"; // ✅ make sure baseURL = https://backendfastapi.sdude.in/
-import { api as axios } from "../api/api";
+import axios from "../api/api"; // ✅ default axios instance with backend URL
 import ResultCard from "./ResultCard";
-
-/**
- * PricePredictor Component
- * -------------------------
- * - Accepts area, bedrooms, bathrooms
- * - Calls FastAPI backend for prediction
- * - Logs prediction to DB
- * - Fetches and displays recent history
- * - Notifies parent (HousePriceDemo) via onPredict()
- */
 
 const PricePredictor = ({ onPredict }) => {
   const [form, setForm] = useState({ area: "", bedrooms: "", bathrooms: "" });
@@ -20,9 +10,6 @@ const PricePredictor = ({ onPredict }) => {
   const [history, setHistory] = useState([]);
   const [error, setError] = useState(null);
 
-  // ===========================
-  // 🔹 Handle Form Input Changes
-  // ===========================
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -30,9 +17,6 @@ const PricePredictor = ({ onPredict }) => {
     });
   };
 
-  // ===========================
-  // 🔹 Submit for Prediction
-  // ===========================
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -44,14 +28,14 @@ const PricePredictor = ({ onPredict }) => {
       const price = res.data.predicted_price;
       setPredictedPrice(price);
 
-      // 2️⃣ Log prediction to DB
+      // 2️⃣ Log prediction
       await axios.post("/predict/log", { ...form, predicted_price: price });
 
       // 3️⃣ Fetch updated history
       const hist = await axios.get("/predict/history?limit=5");
       setHistory(hist.data);
 
-      // 4️⃣ Notify parent component (HousePriceDemo)
+      // 4️⃣ Notify parent (HousePriceDemo)
       if (onPredict) onPredict(form, price);
     } catch (err) {
       console.error("❌ Prediction failed:", err);
@@ -61,9 +45,6 @@ const PricePredictor = ({ onPredict }) => {
     }
   };
 
-  // ===========================
-  // 🔹 Load Initial History
-  // ===========================
   useEffect(() => {
     const fetchHistory = async () => {
       try {
@@ -76,9 +57,6 @@ const PricePredictor = ({ onPredict }) => {
     fetchHistory();
   }, []);
 
-  // ===========================
-  // 🔹 UI Render
-  // ===========================
   return (
     <div style={styles.container}>
       <h2 style={styles.title}>🏡 House Price Predictor</h2>
@@ -120,15 +98,12 @@ const PricePredictor = ({ onPredict }) => {
         </button>
       </form>
 
-      {/* Error Handling */}
       {error && <p style={styles.error}>{error}</p>}
 
-      {/* Show Prediction */}
       {predictedPrice && (
         <ResultCard inputData={form} predictedPrice={predictedPrice} />
       )}
 
-      {/* History Table */}
       {history.length > 0 && (
         <div style={styles.history}>
           <h4 style={styles.historyTitle}>📜 Recent Predictions</h4>
@@ -165,9 +140,7 @@ const PricePredictor = ({ onPredict }) => {
   );
 };
 
-// ===========================
-// 🎨 Inline Styling (Modern + Clean)
-// ===========================
+// 🎨 Styles
 const styles = {
   container: {
     background: "#fff",
@@ -230,14 +203,6 @@ const styles = {
     width: "100%",
     borderCollapse: "collapse",
     fontSize: "15px",
-  },
-  th: {
-    background: "#f3f3f3",
-    padding: "8px",
-  },
-  td: {
-    borderBottom: "1px solid #ddd",
-    padding: "8px",
   },
 };
 

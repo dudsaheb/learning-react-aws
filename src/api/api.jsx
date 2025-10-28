@@ -1,7 +1,15 @@
-// src/api/api.js
+// ✅ src/api/api.jsx
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL || "https://backendfastapi.sdude.in";
+
+// ✅ Create a reusable Axios instance
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 /**
  * ============================
@@ -9,14 +17,10 @@ const API_URL = import.meta.env.VITE_API_URL || "https://backendfastapi.sdude.in
  * ============================
  */
 
-/**
- * Predict house price based on user input.
- * @param {Object} payload - { area, bedrooms, bathrooms }
- * @returns {Promise<Object>} predicted price JSON
- */
+/** Predict house price based on user input. */
 export const predictHousePrice = async (payload) => {
   try {
-    const res = await axios.post(`${API_URL}/predict`, payload);
+    const res = await api.post("/predict", payload);
     return res.data;
   } catch (error) {
     console.error("❌ Error in predictHousePrice:", error);
@@ -24,13 +28,10 @@ export const predictHousePrice = async (payload) => {
   }
 };
 
-/**
- * Fetch model metadata (optional endpoint)
- * Helps verify if the ML model is live and returns model info.
- */
+/** Fetch model metadata (optional endpoint). */
 export const fetchModelInfo = async () => {
   try {
-    const res = await axios.get(`${API_URL}/predict/info`);
+    const res = await api.get("/predict/info");
     return res.data;
   } catch (error) {
     console.error("❌ Error fetching model info:", error);
@@ -38,13 +39,10 @@ export const fetchModelInfo = async () => {
   }
 };
 
-/**
- * Log user prediction (optional)
- * This will store the prediction request and result in RDS for analytics.
- */
+/** Log user prediction (for analytics). */
 export const logPrediction = async (payload) => {
   try {
-    const res = await axios.post(`${API_URL}/predict/log`, payload);
+    const res = await api.post("/predict/log", payload);
     return res.data;
   } catch (error) {
     console.error("❌ Error logging prediction:", error);
@@ -52,13 +50,10 @@ export const logPrediction = async (payload) => {
   }
 };
 
-/**
- * Get recent prediction history (optional)
- * Fetches the latest predictions for UI dashboard display.
- */
+/** Get recent prediction history. */
 export const fetchRecentPredictions = async (limit = 10) => {
   try {
-    const res = await axios.get(`${API_URL}/predict/history?limit=${limit}`);
+    const res = await api.get(`/predict/history?limit=${limit}`);
     return res.data;
   } catch (error) {
     console.error("❌ Error fetching recent predictions:", error);
@@ -66,17 +61,16 @@ export const fetchRecentPredictions = async (limit = 10) => {
   }
 };
 
-/**
- * ============================
- * 🧩 Health Check
- * ============================
- */
+/** Health check for backend. */
 export const checkBackendHealth = async () => {
   try {
-    const res = await axios.get(`${API_URL}/`);
+    const res = await api.get("/");
     return res.data;
   } catch (error) {
     console.error("❌ Backend health check failed:", error);
     return { status: "down" };
   }
 };
+
+// ✅ Default export for axios instance
+export default api;
