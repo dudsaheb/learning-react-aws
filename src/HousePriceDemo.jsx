@@ -1,26 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import PricePredictor from "./components/PricePredictor";
-import ResultCard from "./components/ResultCard";
-
 
 /**
  * HousePriceDemo.jsx
  * -------------------
- * Combines the PricePredictor (form + history)
- * and ResultCard (prediction display) into one cohesive page.
- * Acts as a full demo for your deployed AI/ML app.
+ * Full AI/ML demo page for House Price Prediction.
+ * Contains the PricePredictor component (form + result + history).
  */
 
 const HousePriceDemo = () => {
-  const [prediction, setPrediction] = useState(null);
-  const [inputData, setInputData] = useState(null);
-
-  // ✅ Called when prediction completes in PricePredictor
-  const handlePredictionComplete = (data, predictedPrice) => {
-    setInputData(data);
-    setPrediction(predictedPrice);
-  };
-
   return (
     <div style={styles.pageContainer}>
       {/* ===== Page Header ===== */}
@@ -34,17 +22,9 @@ const HousePriceDemo = () => {
 
       {/* ===== Main Content ===== */}
       <main style={styles.main}>
-        {/* Left: Predictor */}
         <section style={styles.section}>
-          <PricePredictor onPredict={handlePredictionComplete} />
+          <PricePredictor />
         </section>
-
-        {/* Right: Result (only shown after prediction) */}
-        {prediction !== null && (
-          <section style={styles.section}>
-            <ResultCard inputData={inputData} predictedPrice={prediction} />
-          </section>
-        )}
       </main>
 
       {/* ===== Footer ===== */}
