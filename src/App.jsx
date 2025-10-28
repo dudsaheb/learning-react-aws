@@ -14,6 +14,7 @@ import LoadTestPage from "./LoadTestPage";
 import WelcomePage from './WelcomePage';
 import PricePredictor from './components/PricePredictor';   // ✅ AI/ML page
 import ResultCard from './components/ResultCard';           // ✅ Prediction results display
+import HousePriceDemo from './HousePriceDemo';
 
 function App() {
   return (
@@ -72,6 +73,7 @@ function App() {
             {/* ===== AI/ML Routes ===== */}
             <Route path="/predict" element={<PricePredictor />} />
             <Route path="/result" element={<ResultCard />} />
+            <Route path="/house-price-ai-ml-demo" element={<HousePriceDemo />} />
 
             {/* ===== Fallback ===== */}
             <Route path="*" element={<NotFound />} />
