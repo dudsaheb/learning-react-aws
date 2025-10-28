@@ -13,7 +13,9 @@ function ProtectedRoute({ children }) {
     "/login",
     "/register",
     "/paytest",
-    "/loadtest"
+    "/loadtest",
+    "/predict",
+    "/result"
   ];
 
   useEffect(() => {

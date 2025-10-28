@@ -11,21 +11,27 @@ import { AuthProvider } from './auth/AuthContext';
 import UserDogs from './dogs/UserDogs';
 import DogsAccount from './dogs/DogsAccount';
 import LoadTestPage from "./LoadTestPage";
-import WelcomePage from './WelcomePage';  
-
+import WelcomePage from './WelcomePage';
+import PricePredictor from './components/PricePredictor';   // ✅ AI/ML page
+import ResultCard from './components/ResultCard';           // ✅ Prediction results display
 
 function App() {
   return (
     <Router>
       <AuthProvider>
+        {/* Global navigation (optional, enable if you want a top nav) */}
         {/* <Navbar /> */}
+
         <div className="custom-container">
           <Routes>
-            {/* <Route path="/" element={<LoginPage />} /> */}
+
+            {/* ===== Public Routes ===== */}
             <Route path="/" element={<WelcomePage />} />
             <Route path="/welcome" element={<WelcomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+
+            {/* ===== Protected Routes ===== */}
             <Route
               path="/posts"
               element={
@@ -58,9 +64,18 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            {/* ===== Testing Utilities ===== */}
             <Route path="/loadtest" element={<LoadTestPage />} />
             <Route path="/paytest" element={<LoadTestPage />} />
-            <Route path="*" element={<NotFound />} /> {/* Catch-all route */}
+
+            {/* ===== AI/ML Routes ===== */}
+            <Route path="/predict" element={<PricePredictor />} />
+            <Route path="/result" element={<ResultCard />} />
+
+            {/* ===== Fallback ===== */}
+            <Route path="*" element={<NotFound />} />
+
           </Routes>
         </div>
       </AuthProvider>
