@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import PricePredictor from "./PricePredictor";
-import ResultCard from "./ResultCard";
+import PricePredictor from "./components/PricePredictor";
+import ResultCard from "./components/ResultCard";
+
 
 /**
  * HousePriceDemo.jsx
