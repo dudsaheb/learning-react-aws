@@ -72,5 +72,16 @@ export const checkBackendHealth = async () => {
   }
 };
 
+export const fetchAgentAdvice = async (payload) => {
+  try {
+    const res = await axios.post(`${API_URL}/agent/advise`, payload, { timeout: 120000 });
+    return res.data; // { advice: "...", actions: [...] }
+  } catch (error) {
+    console.error("❌ Error fetching agent advice:", error);
+    throw error;
+  }
+};
+
+
 // ✅ Default export for axios instance
 export default api;

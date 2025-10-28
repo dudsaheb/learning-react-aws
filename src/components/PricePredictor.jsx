@@ -1,7 +1,8 @@
 // ✅ src/components/PricePredictor.jsx
 import React, { useState, useEffect } from "react";
-import axios from "../api/api"; // ✅ default axios instance with backend URL
+import axios from "../api/api"; // Default backend instance
 import ResultCard from "./ResultCard";
+import { fetchAgentAdvice } from "../api/api"; // New AI Agent API
 
 const PricePredictor = ({ onPredict }) => {
   const [form, setForm] = useState({ area: "", bedrooms: "", bathrooms: "" });
@@ -9,7 +10,10 @@ const PricePredictor = ({ onPredict }) => {
   const [predictedPrice, setPredictedPrice] = useState(null);
   const [history, setHistory] = useState([]);
   const [error, setError] = useState(null);
+  const [agentAdvice, setAgentAdvice] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
 
+  // Handle form input changes
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -17,18 +21,20 @@ const PricePredictor = ({ onPredict }) => {
     });
   };
 
+  // Submit to ML backend for price prediction
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setAgentAdvice(null); // Reset previous AI output
 
     try {
-      // 1️⃣ Predict price
+      // 1️⃣ Predict price using ML model
       const res = await axios.post("/predict", form);
       const price = res.data.predicted_price;
       setPredictedPrice(price);
 
-      // 2️⃣ Log prediction
+      // 2️⃣ Log prediction to DB
       await axios.post("/predict/log", { ...form, predicted_price: price });
 
       // 3️⃣ Fetch updated history
@@ -37,14 +43,34 @@ const PricePredictor = ({ onPredict }) => {
 
       // 4️⃣ Notify parent (HousePriceDemo)
       if (onPredict) onPredict(form, price);
+
+      // 5️⃣ Call the Generative Agent to explain and analyze prediction
+      setAiLoading(true);
+      const agentGoal = `
+        Analyze the following house details:
+        - Area: ${form.area} sq.ft
+        - Bedrooms: ${form.bedrooms}
+        - Bathrooms: ${form.bathrooms}
+        - Predicted price: ₹${(price * 100000).toLocaleString()}.
+        Compare this with typical Bangalore market rates, 
+        and give a short investment insight or pricing strategy.
+      `;
+      const agentRes = await fetchAgentAdvice({
+        goal: agentGoal,
+        max_listings: 3,
+        location: "Bangalore",
+      });
+      setAgentAdvice(agentRes.advice);
     } catch (err) {
       console.error("❌ Prediction failed:", err);
       setError("Failed to fetch prediction. Please try again.");
     } finally {
       setLoading(false);
+      setAiLoading(false);
     }
   };
 
+  // Load recent prediction history
   useEffect(() => {
     const fetchHistory = async () => {
       try {
@@ -57,13 +83,15 @@ const PricePredictor = ({ onPredict }) => {
     fetchHistory();
   }, []);
 
+  // Render UI
   return (
     <div style={styles.container}>
-      <h2 style={styles.title}>🏡 House Price Predictor</h2>
+      <h2 style={styles.title}>🏡 House Price Predictor + AI Advisor</h2>
       <p style={styles.subtitle}>
-        Enter house details to estimate its market value instantly.
+        Enter house details to estimate its price using ML — then let our AI Agent explain the reasoning and market insight.
       </p>
 
+      {/* Prediction Form */}
       <form onSubmit={handleSubmit} style={styles.form}>
         <input
           name="area"
@@ -94,16 +122,31 @@ const PricePredictor = ({ onPredict }) => {
         />
 
         <button type="submit" disabled={loading} style={styles.button}>
-          {loading ? "Predicting..." : "🔮 Predict Price"}
+          {loading ? "Predicting..." : "🔮 Predict & Analyze"}
         </button>
       </form>
 
+      {/* Error */}
       {error && <p style={styles.error}>{error}</p>}
 
+      {/* ML Result Card */}
       {predictedPrice && (
         <ResultCard inputData={form} predictedPrice={predictedPrice} />
       )}
 
+      {/* Generative AI / Agentic Advice */}
+      {aiLoading && (
+        <p style={styles.loading}>🤖 AI Agent is analyzing market data...</p>
+      )}
+
+      {agentAdvice && (
+        <div style={styles.adviceBox}>
+          <h4 style={styles.adviceTitle}>💬 AI Property Insight</h4>
+          <p style={styles.adviceText}>{agentAdvice}</p>
+        </div>
+      )}
+
+      {/* History Table */}
       {history.length > 0 && (
         <div style={styles.history}>
           <h4 style={styles.historyTitle}>📜 Recent Predictions</h4>
@@ -140,13 +183,15 @@ const PricePredictor = ({ onPredict }) => {
   );
 };
 
-// 🎨 Styles
+// ============================
+// 🎨 Modern Styles
+// ============================
 const styles = {
   container: {
     background: "#fff",
     borderRadius: "12px",
     padding: "30px",
-    maxWidth: "700px",
+    maxWidth: "720px",
     margin: "20px auto",
     boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
     textAlign: "center",
@@ -154,12 +199,12 @@ const styles = {
   title: {
     fontSize: "24px",
     marginBottom: "10px",
-    color: "#333",
+    color: "#222",
   },
   subtitle: {
     fontSize: "15px",
-    color: "#666",
-    marginBottom: "20px",
+    color: "#555",
+    marginBottom: "25px",
   },
   form: {
     display: "flex",
@@ -173,7 +218,6 @@ const styles = {
     borderRadius: "6px",
     border: "1px solid #ccc",
     outline: "none",
-    transition: "border-color 0.2s",
   },
   button: {
     backgroundColor: "#007bff",
@@ -183,12 +227,34 @@ const styles = {
     borderRadius: "6px",
     border: "none",
     cursor: "pointer",
-    transition: "all 0.2s",
   },
   error: {
     color: "red",
     fontSize: "14px",
     marginTop: "10px",
+  },
+  loading: {
+    color: "#007bff",
+    fontStyle: "italic",
+    marginTop: "10px",
+  },
+  adviceBox: {
+    marginTop: "25px",
+    background: "#f8faff",
+    border: "1px solid #cfe2ff",
+    borderRadius: "10px",
+    padding: "15px",
+    textAlign: "left",
+  },
+  adviceTitle: {
+    fontSize: "18px",
+    color: "#004085",
+    marginBottom: "8px",
+  },
+  adviceText: {
+    fontSize: "15px",
+    color: "#333",
+    whiteSpace: "pre-wrap",
   },
   history: {
     marginTop: "30px",
