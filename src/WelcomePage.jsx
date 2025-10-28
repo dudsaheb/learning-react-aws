@@ -93,11 +93,12 @@ function WelcomePage() {
             ...(isMobile ? styles.projectColumnMobile : {}),
           }}
         >
-          <h2 style={styles.sectionHeader}>Projects</h2>
+          <h2 style={styles.sectionHeader}>Demo Projects Portfolio</h2>
+          <p>Demonstrates my technical expertise in end-to-end development — spanning frontend, backend, and API integration — and proficiency in AWS cloud infrastructure (SQS, RDS, Amplify, S3, Elastic Beanstalk, Route 53, Certificate Manager), backed by years of experience in mobile app engineering and delivery.</p>
           <ul style={styles.linkList}>
             {[
-              { text: "React Project (Petowners) + FastAPI", href: "/login" },
-              { text: "Payment Load Simulator", href: "/paytest" },
+              { text: "Petowners — A full-stack web app built with React (frontend) and FastAPI (backend), deployed on AWS.", href: "/login" },
+              { text: "Payment Load Simulator — Built to emulate high-volume transaction scenarios, enabling performance benchmarking, API stress testing, and load analysis across backend services", href: "/paytest" },
               { text: "AI / ML Project Demos", href: "/ai-ml-demo" },
             ].map((item, index) => (
               <li key={index}>
