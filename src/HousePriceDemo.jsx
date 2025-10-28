@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import PricePredictor from "./components/PricePredictor";
 import axios from "./api/api";
 
 /**
  * HousePriceDemo.jsx
  * -------------------
- * Enhanced version:
- * - Includes city selection
- * - Dynamically generates AI goal based on area, bedrooms, bathrooms
- * - Lists 10 property areas and price ranges using OpenAI Agent
+ * AI-enhanced real estate demo with city selection.
+ * Lets user choose a city and fetches dynamic listings via Agentic AI.
  */
 
 const HousePriceDemo = () => {
@@ -18,14 +16,12 @@ const HousePriceDemo = () => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState(null);
 
-  // ===============================
-  // 🔹 Fetch AI Advice Dynamically
-  // ===============================
+  // 🔹 Fetch AI advice from backend
   const fetchAgentAdvice = async (data, city) => {
     if (!data?.area || !data?.bedrooms || !data?.bathrooms) return;
 
     const goal = `List top 10 property locations in ${city} for a ${data.bedrooms}BHK, ${data.area} sq.ft house with ${data.bathrooms} bathrooms. 
-    Include the area/locality name and the minimum to maximum price range in Indian Rupees.`;
+    Include minimum and maximum price range with area names.`;
 
     setLoading(true);
     setAgentAdvice("");
@@ -37,29 +33,27 @@ const HousePriceDemo = () => {
         location: city,
       });
 
-      setAgentAdvice(res.data.advice || "No AI insights available.");
+      setAgentAdvice(res.data.advice || "No AI insights returned.");
       const action = res.data.actions?.[0];
-      if (action?.result?.listings) setPropertyList(action.result.listings);
+      if (action?.result?.listings) {
+        setPropertyList(action.result.listings);
+      }
     } catch (error) {
       console.error("❌ Error fetching AI insights:", error);
-      setAgentAdvice("Failed to get insights. Please try again later.");
+      setAgentAdvice("Failed to get insights. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  // ===============================
-  // 🔹 City Change Handler
-  // ===============================
+  // 🔹 Handle City Change
   const handleCityChange = (e) => {
     const city = e.target.value;
     setSelectedCity(city);
     if (formData) fetchAgentAdvice(formData, city);
   };
 
-  // ===============================
-  // 🔹 Handle Prediction Completion
-  // ===============================
+  // 🔹 When prediction completes in PricePredictor
   const handlePredictionComplete = (data) => {
     setFormData(data);
     fetchAgentAdvice(data, selectedCity);
@@ -67,36 +61,44 @@ const HousePriceDemo = () => {
 
   return (
     <div style={styles.pageContainer}>
-      {/* ===== Header ===== */}
+      {/* ===== Page Header ===== */}
       <header style={styles.header}>
-        <h1 style={styles.title}>🏡 AI Property & Price Prediction</h1>
+        <h1 style={styles.title}>🏡 House Price & Property Advisor</h1>
         <p style={styles.subtitle}>
-          Predict house prices and explore property insights with{" "}
+          Predict prices and explore area insights powered by{" "}
           <strong>FastAPI + Scikit-learn + OpenAI Agent</strong>.
         </p>
       </header>
 
-      {/* ===== City Selection ===== */}
+      {/* ===== City Selector ===== */}
       <div style={styles.citySelectorContainer}>
         <label style={styles.label}>Select City:</label>
-        <select value={selectedCity} onChange={handleCityChange} style={styles.select}>
-          <option>Bangalore</option>
-          <option>Hyderabad</option>
-          <option>Pune</option>
-          <option>Chennai</option>
+        <select
+          value={selectedCity}
+          onChange={handleCityChange}
+          style={styles.select}
+        >
+          <option value="Bangalore">🏙️ Bangalore</option>
+          <option value="Hyderabad">🌇 Hyderabad</option>
+          <option value="Pune">🏢 Pune</option>
+          <option value="Chennai">🌴 Chennai</option>
         </select>
       </div>
 
-      {/* ===== Main Predictor Section ===== */}
+      {/* ===== Predictor Section ===== */}
       <main style={styles.main}>
         <section style={styles.section}>
           <PricePredictor onPredict={handlePredictionComplete} />
         </section>
       </main>
 
-      {/* ===== AI Advisor Section ===== */}
+      {/* ===== AI Section ===== */}
       <section style={styles.agentSection}>
-        {loading && <p>🤖 Fetching AI insights for {selectedCity}...</p>}
+        {loading && (
+          <p>
+            🤖 Fetching AI insights for <strong>{selectedCity}</strong>...
+          </p>
+        )}
 
         {!loading && agentAdvice && (
           <>
@@ -121,7 +123,12 @@ const HousePriceDemo = () => {
                 {propertyList.map((p) => (
                   <tr key={p.id}>
                     <td>
-                      <a href={p.url} target="_blank" rel="noopener noreferrer" style={styles.link}>
+                      <a
+                        href={p.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={styles.link}
+                      >
                         {p.title}
                       </a>
                     </td>
@@ -141,7 +148,7 @@ const HousePriceDemo = () => {
       {/* ===== Footer ===== */}
       <footer style={styles.footer}>
         <p>
-          Built with ❤️ by <strong>Shaik Dud Saheb</strong> using FastAPI, React, and OpenAI Agentic AI.
+          Built with ❤️ by <strong>Shaik Dud Saheb</strong> using FastAPI, React, and OpenAI.
         </p>
       </footer>
     </div>
@@ -177,8 +184,9 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: "20px",
     gap: "10px",
+    marginTop: "25px",
+    marginBottom: "10px",
   },
   label: { fontWeight: "600", fontSize: "16px", color: "#333" },
   select: {
@@ -188,6 +196,8 @@ const styles = {
     border: "1px solid #ccc",
     outline: "none",
     cursor: "pointer",
+    backgroundColor: "#fff",
+    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
   },
   main: {
     display: "flex",
