@@ -93,14 +93,12 @@ function WelcomePage() {
             ...(isMobile ? styles.projectColumnMobile : {}),
           }}
         >
-          <h2 style={styles.sectionHeader}>Demo Projects Portfolio</h2>          
+          <h2 style={styles.sectionHeader}>Demo Projects Portfolio</h2>
           <ul style={styles.linkList}>
             {[
               { text: "Petowners — React (frontend) and FastAPI (backend), deployed on AWS.", href: "/login" },
               { text: "Payment Load Simulator", href: "/paytest" },
               { text: "House Price Prediction - Agentic AI", href: "/house-price-ai-ml-demo" },
-              
-              
             ].map((item, index) => (
               <li key={index}>
                 <a
@@ -166,8 +164,8 @@ function WelcomePage() {
           </div>
         </div>
       </div>
-      {/* <p>Demonstrates my technical expertise in end-to-end development — spanning frontend, backend, and API integration — and proficiency in AWS cloud infrastructure (SQS, RDS, Amplify, S3, Elastic Beanstalk, Route 53, Certificate Manager), backed by years of experience in mobile app engineering and delivery.</p> */}
 
+      {/* Footer */}
       <p style={styles.footer}>
         © {new Date().getFullYear()} sdude.in — All Rights Reserved
       </p>
@@ -175,7 +173,7 @@ function WelcomePage() {
   );
 }
 
-/* ✅ INLINE RESPONSIVE STYLES */
+/* ✅ Responsive, balanced styles */
 const styles = {
   container: {
     fontFamily: "Arial, sans-serif",
@@ -185,12 +183,8 @@ const styles = {
     color: "#31326F",
     textAlign: "center",
   },
-  containerTablet: {
-    padding: "30px",
-  },
-  containerMobile: {
-    padding: "20px",
-  },
+  containerTablet: { padding: "30px" },
+  containerMobile: { padding: "20px" },
 
   /* Header */
   headerRow: {
@@ -213,13 +207,8 @@ const styles = {
     border: "6px solid #4FB7B3",
     boxShadow: "0 0 12px rgba(49,50,111,0.4)",
   },
-  headerProfileImgMobile: {
-    width: "120px",
-    height: "120px",
-  },
-  headerText: {
-    maxWidth: "500px",
-  },
+  headerProfileImgMobile: { width: "120px", height: "120px" },
+  headerText: { maxWidth: "500px" },
   title: { fontSize: "25px", marginBottom: "5px" },
   titleMobile: { fontSize: "22px" },
   name_title: { fontSize: "20px", marginBottom: "5px" },
@@ -227,40 +216,47 @@ const styles = {
   subtitle: { fontSize: "18px", opacity: 0.85 },
   subtitleMobile: { fontSize: "16px" },
 
-  /* Content layout */
+  /* ✅ Auto-fit 3-column layout */
   row: {
     display: "flex",
     justifyContent: "center",
-    alignItems: "flex-start",
-    gap: "40px",
+    alignItems: "stretch",
+    gap: "30px",
     background: "#ffffffd9",
     padding: "35px",
     borderRadius: "12px",
     boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-    flexWrap: "nowrap",
-  },
-  rowTablet: {
     flexWrap: "wrap",
-    gap: "30px",
+    maxWidth: "950px",
+    margin: "0 auto",
   },
+  rowTablet: { gap: "25px", maxWidth: "90%" },
   rowMobile: {
     flexDirection: "column",
     gap: "20px",
     padding: "25px",
+    width: "100%",
+    maxWidth: "500px",
   },
 
-  column: { width: "250px", textAlign: "left" },
+  column: {
+    flex: "1 1 250px",
+    textAlign: "left",
+    minWidth: "220px",
+    maxWidth: "300px",
+  },
   projectColumn: {
-    width: "280px",
+    flex: "1 1 300px",
     textAlign: "center",
     background: "#F2F4F8CC",
     padding: "20px",
     borderRadius: "10px",
     boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
+    minWidth: "250px",
+    maxWidth: "320px",
+    transition: "all 0.3s ease-in-out",
   },
-  projectColumnMobile: {
-    width: "100%",
-  },
+  projectColumnMobile: { width: "100%" },
 
   sectionHeader: {
     fontSize: "22px",
@@ -270,8 +266,6 @@ const styles = {
     paddingBottom: "6px",
   },
   paragraph: { lineHeight: "1.6", fontSize: "15px" },
-
-  /* Social + links */
   socialRow: { marginTop: "15px", display: "flex", gap: "15px" },
   socialIcon: {
     fontSize: "20px",
